@@ -131,6 +131,20 @@ This is an honest, externally-reviewed assessment. None of these are bugs — th
 | **Single real-rule example** | Only `word_templates_choice` has been deployed end-to-end. Pressure testing with 10 synthetic rules proves performance scales, but real-world multi-rule behavior (pattern conflicts, threshold coupling, alert noise) hasn't been validated. | This is the next phase. The RULES object architecture is designed for N rules — but "designed for" ≠ "battle-tested with." |
 | **Regex-based detection** | Trigger and compliance patterns are hand-written regular expressions. False negatives occur if the agent expresses the same behavior using different phrasing. | LLM-assisted pattern generation is an obvious next step. The two-stage architecture reserves "Stage 2" for exactly this — swap regex for a focused LLM call when accuracy demands it. |
 
+## Ecosystem
+
+rulehook enforces rules. But what rules?
+
+**[ECC](https://github.com/affaan-m/ECC)** — a mature, layered rule system covering 12+ languages (TypeScript, Python, Go, Rust, React, web, and more). Common rules define universal standards; language-specific rules override where idioms differ. 34 rule files with multi-language (EN/ZH) support.
+
+ecc-rules: WHAT to check          rulehook: HOW to enforce
+common/coding-style.md            RULES object in session-start-compliance-audit.js
+typescript/coding-style.md        triggerPatterns + compliancePatterns
+web/design-quality.md             L1: SKILL.md injection / L2: Stop hook grep / L3: SessionStart audit
+
+**Combine them:** install ecc-rules for the standards, configure rulehook to enforce them. Together they close the loop: rules define what is expected, hooks ensure it happens.
+
+
 ## File map
 
 | File | Role |
