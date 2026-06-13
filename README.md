@@ -119,6 +119,18 @@ One JSON entry per rule. No other changes needed.
 | Token | 0 (only a 50-token systemMessage on violation) |
 | Dependencies | 0 (Node.js stdlib only) |
 
+## Known Limitations
+
+This is an honest, externally-reviewed assessment. None of these are bugs — they are deliberate design tradeoffs or areas awaiting real-world validation.
+
+| Limitation | Impact | Why it exists |
+|---|---|---|
+| **Claude Code only** | Hook registration format (`settings.json` SessionStart/Stop) is bound to Claude Code. Cannot be directly ported to Cursor, Codex, or other agent platforms. | Architectural choice, not a bug. The correct cross-platform path is to extract a platform-agnostic rule schema and write per-platform adapters — like ESLint's parser/plugin model. |
+| **Cross-turn matching blindspot** | Template discussion in turn 3 + doc generation in turn 99 (outside the 500-line scan window) → L2 may false-positive. | Deliberate. Scanning the full transcript would break the 10ms performance guarantee. Mitigated by non-blocking systemMessage — Claude can judge false positives itself. |
+| **L3 depends on observe.sh data pipeline** | SessionStart compliance audit reads `observations.jsonl`. New deployments with no ECC observe.sh history see no data → L3 silently degrades (by design: no data = no false alarms). | The audit script gracefully skips when no data exists. For standalone use, rulehook can record its own observations — this is a planned improvement, not a permanent dependency. |
+| **Single real-rule example** | Only `word_templates_choice` has been deployed end-to-end. Pressure testing with 10 synthetic rules proves performance scales, but real-world multi-rule behavior (pattern conflicts, threshold coupling, alert noise) hasn't been validated. | This is the next phase. The RULES object architecture is designed for N rules — but "designed for" ≠ "battle-tested with." |
+| **Regex-based detection** | Trigger and compliance patterns are hand-written regular expressions. False negatives occur if the agent expresses the same behavior using different phrasing. | LLM-assisted pattern generation is an obvious next step. The two-stage architecture reserves "Stage 2" for exactly this — swap regex for a focused LLM call when accuracy demands it. |
+
 ## File map
 
 | File | Role |
