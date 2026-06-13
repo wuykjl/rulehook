@@ -1,0 +1,33 @@
+{
+  "_comment": "Add these to your ~/.claude/settings.json under the top-level 'hooks' key. Merge with your existing hooks — do NOT replace.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/scripts/hooks/session-start-compliance-audit.js\"",
+            "timeout": 15
+          }
+        ],
+        "description": "Scan observations.jsonl for historical rule compliance rates; inject context if any rule is below threshold",
+        "id": "session-start:compliance-audit"
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/scripts/hooks/stop-doc-template-check.js\"",
+            "timeout": 15
+          }
+        ],
+        "description": "Two-stage audit: doc generation → template preference check",
+        "id": "stop:doc-template-check"
+      }
+    ]
+  }
+}
